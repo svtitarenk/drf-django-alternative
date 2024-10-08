@@ -1,10 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 
 from dogs.models import Dog, Breed
 from dogs.serializers import DogSerializer, BreedSerializer, DogDetailSerializer
+from users.permissions import IsModer, IsOwner
 
 
 class DogViewSet(ModelViewSet):
@@ -27,11 +29,34 @@ class DogViewSet(ModelViewSet):
             return DogDetailSerializer
         return DogSerializer
 
+    def perform_create(self, serializer):
+        dog = serializer.save()
+        dog.owner = self.request.user
+        dog.save()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = (~IsModer,)
+        elif self.action in ['update', 'retrieve']:
+            self.permission_classes = (IsModer | IsOwner,)
+        elif self.action == 'destroy':
+            self.permission_classes = (IsOwner | ~IsModer,)  # не модератор и владелец
+        return super().get_permissions()
+
 
 # Делаем CRUD классы для пород
 class BreedCreateAPIView(CreateAPIView):
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
+    # permission_classes = (~IsModer,)  # проверка на то, что пользователь не модератор.
+    # поскольку мы переопределили permission на уровне класса, то permission на уровне проекта уже не работает
+    permission_classes = (~IsModer, IsAuthenticated)
+
+    def perform_create(self, serializer):
+        """ Присваиваем владельца собаке """
+        breed = serializer.save()
+        breed.owner = self.request.user
+        breed.save()
 
 
 class BreedListAPIView(ListAPIView):
@@ -42,13 +67,16 @@ class BreedListAPIView(ListAPIView):
 class BreedRetrieveAPIView(RetrieveAPIView):
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
+    permission_classes = (IsAuthenticated, IsModer | IsOwner,)
 
 
 class BreedUpdateAPIView(UpdateAPIView):
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
+    permission_classes = (IsAuthenticated, IsModer | IsOwner,)
 
 
 class BreedDestroyAPIView(DestroyAPIView):
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
+    permission_classes = (IsAuthenticated, IsOwner | ~IsModer,)
