@@ -1,0 +1,55 @@
+{
+  'count': 1,
+  'next': None,
+  'previous': None,
+  'results': [
+    {
+      'id': 4,
+      'breed': {
+        'id': 3,
+        'dogs': [
+          'setupTestDog'
+        ],
+        'name': 'Лабрадор',
+        'description': 'Очень красивая порода',
+        'owner': None
+      },
+      'name': 'setupTestDog',
+      'photo': None,
+      'date_born': None,
+      'owner': 3
+    }
+  ]
+}
+
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 2,
+      "dogs": [],
+      "name": "Овчарка",
+      "description": "Овчарка немецкая",
+      "owner": null
+    },
+    {
+      "id": 3,
+      "dogs": [],
+      "name": "Ретривер",
+      "description": null,
+      "owner": 3
+    },
+    {
+      "id": 1,
+      "dogs": [
+        "Колли1",
+        "Шарик testuser"
+      ],
+      "name": "Колли Американская",
+      "description": "Американская порода собак. Собаки похожие на лис. Невероятно красивая",
+      "owner": null
+    }
+  ]
+}
