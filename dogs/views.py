@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 
 from dogs.models import Dog, Breed
+from dogs.paginations import CustomPagination
 from dogs.serializers import DogSerializer, BreedSerializer, DogDetailSerializer
 from users.permissions import IsModer, IsOwner
 
@@ -19,6 +20,7 @@ class DogViewSet(ModelViewSet):
     # добавялем поля для сортировки
     ordering_fields = ('date_born',)
     search_fields = ('name',)
+    pagination_class = CustomPagination
 
     # Сериализаторы нужны, чтобы обрабатывать данные из БД в формат, который мы будем выводить
     # serializer_class = DogSerializer
@@ -62,6 +64,7 @@ class BreedCreateAPIView(CreateAPIView):
 class BreedListAPIView(ListAPIView):
     queryset = Breed.objects.all()
     serializer_class = BreedSerializer
+    pagination_class = CustomPagination
 
 
 class BreedRetrieveAPIView(RetrieveAPIView):

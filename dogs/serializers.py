@@ -1,11 +1,12 @@
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from dogs.models import Dog, Breed
+from dogs.validators import validate_forbidden_words
 
 
-class BreedSerializer(ModelSerializer):
-    dogs = SerializerMethodField()
+class BreedSerializer(serializers.ModelSerializer):
+    dogs = serializers.SerializerMethodField()
 
     def get_dogs(self, breed):
         # получаем все собаки этой породы
@@ -21,8 +22,10 @@ class BreedSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class DogSerializer(ModelSerializer):
+class DogSerializer(serializers.ModelSerializer):
     breed = BreedSerializer(read_only=True)
+    # прописываем валидатор черезе serializers. + validators + в списке передаем валидаторы
+    name = serializers.CharField(validators=[validate_forbidden_words])
 
     class Meta:
         model = Dog
@@ -32,11 +35,11 @@ class DogSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class DogDetailSerializer(ModelSerializer):
+class DogDetailSerializer(serializers.ModelSerializer):
     # нужно добавить поле, которое будет выводить собак такой же породы
     # если нам нужно добавить кастомное поле, нужно его прописать
     # но у нас не описан метод, как получать это поле, описываем ниже (def get_count_dog_with_same_breed)
-    count_dog_with_same_breed = SerializerMethodField()
+    count_dog_with_same_breed = serializers.SerializerMethodField()
 
     # теперь поле breed будет определяться сериализатором BreedSerializer
     breed = BreedSerializer(read_only=True)  # включаем сериализатор порода в ответе.
