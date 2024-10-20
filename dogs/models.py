@@ -40,6 +40,13 @@ class Dog(models.Model):
         verbose_name="Владелец",
         help_text="Укажите владельца собаки"
     )
+    likes = models.ManyToManyField(
+        User,
+        **NULLABLE,
+        verbose_name="Лайки",
+        help_text="Укажите лайки",
+        related_name="user_likes"
+    )
 
     class Meta:
         verbose_name = "Собака"
